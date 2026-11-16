@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#0c0a08">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>大曜 · 武道王朝</title>
+<meta name="description" content="一款由 AI 推演后果的文字权谋游戏：你是一国之君，每一个抉择都会长出你意想不到的枝节。">
+<link rel="stylesheet" href="./style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%230c0a08'/%3E%3Crect x='8' y='8' width='48' height='48' fill='none' stroke='%23b23a2f' stroke-width='3'/%3E%3Ctext x='32' y='44' font-size='30' fill='%23c8a45c' text-anchor='middle' font-family='serif'%3E曜%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+
+<!-- ════════ 开场 ════════ -->
+<section id="screen-title" class="screen screen--title is-active">
+  <div class="title-watermark" aria-hidden="true">曜</div>
+  <div class="title-inner">
+    <div class="seal seal--lg" aria-hidden="true"><span>大</span><span>曜</span></div>
+    <h1 class="wordmark">大曜</h1>
+    <p class="wordmark-sub">武 道 王 朝</p>
+    <p class="title-lede">
+      九州东陆，武道为尊。<br>
+      一位大宗师可镇一州，一位天人可压一国。<br>
+      而你手中，是立国三百二十年的社稷。
+    </p>
+    <div class="title-actions">
+      <button class="btn btn--ink" id="btn-new">开 国</button>
+      <button class="btn btn--ghost" id="btn-continue" hidden>续 卷</button>
+    </div>
+    <p class="title-foot">第七帝 · 永昌二十七年 · 天枢城</p>
+  </div>
+</section>
+
+<!-- ════════ 游戏 ════════ -->
+<section id="screen-game" class="screen screen--game">
+  <header class="hud">
+    <div class="hud-era">
+      <span class="era-name" id="era-name">永昌</span>
+      <span class="era-year" id="era-year">二十七年</span>
+      <span class="era-mode" id="era-mode">推演</span>
+    </div>
+    <div class="hud-btns">
+      <button class="icon-btn" id="btn-chronicle" aria-label="大事记"><span>史</span></button>
+      <button class="icon-btn" id="btn-settings" aria-label="设置"><span>设</span></button>
+    </div>
+  </header>
+
+  <div class="stats" id="stats"></div>
+
+  <main class="stage">
+    <article class="scene" id="scene">
+      <div class="scene-omen" id="omen"></div>
+      <div class="scene-head"><span class="brush"></span><span id="scene-tag">朝 议</span></div>
+      <h2 class="scene-title" id="scene-title">—</h2>
+      <div class="scene-text" id="scene-text"></div>
+    </article>
+  </main>
+
+  <div class="decision">
+    <div class="choices" id="choices"></div>
+    <button class="custom-toggle" id="custom-toggle">
+      <span>另 辟 蹊 径</span><em>自拟旨意</em>
+    </button>
+    <div class="custom-panel" id="custom-panel" hidden>
+      <textarea id="custom-input" maxlength="60" rows="2" placeholder="例：削晋王三护卫，贬为庶人，即刻执行。"></textarea>
+      <div class="custom-row">
+        <span class="counter" id="custom-counter">0/60</span>
+        <button class="btn btn--seal" id="btn-decree">传 旨</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ 结算 ════════ -->
+<div class="sheet" id="sheet-outcome" hidden>
+  <div class="sheet-backdrop"></div>
+  <div class="sheet-panel">
+    <div class="sheet-bar"></div>
+    <div class="sheet-inner">
+      <div class="sheet-head">
+        <span class="seal seal--sm">史</span>
+        <div>
+          <h3>史 官 落 笔</h3>
+          <p class="sheet-year" id="sheet-year"></p>
+        </div>
+      </div>
+      <div class="outcome-text" id="outcome-text"></div>
+      <div class="deltas" id="deltas"></div>
+      <div class="figure-card" id="figure-card" hidden></div>
+      <div class="sheet-foot">
+        <button class="btn btn--ink" id="btn-next">翻 篇</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ 大事记 ════════ -->
+<aside class="drawer" id="drawer-chronicle" hidden>
+  <div class="drawer-backdrop" data-close></div>
+  <div class="drawer-panel">
+    <header><h3>大 事 记</h3><button class="icon-btn" data-close aria-label="关闭">×</button></header>
+    <div class="chronicle-list" id="chronicle-list"></div>
+  </div>
+</aside>
+
+<!-- ════════ 设置 ════════ -->
+<div class="modal" id="modal-settings" hidden>
+  <div class="modal-backdrop" data-close></div>
+  <div class="modal-panel">
+    <header><h3>设 置</h3><button class="icon-btn" data-close aria-label="关闭">×</button></header>
+    <div class="modal-body">
+      <div class="field">
+        <label>推演引擎</label>
+        <div class="engine-state" id="engine-state">检测中…</div>
+      </div>
+      <div class="field">
+        <label for="key-input">DeepSeek API Key</label>
+        <input id="key-input" type="password" autocomplete="off" spellcheck="false" placeholder="sk-…">
+        <p class="hint">密钥只保存在<strong>你这台设备的浏览器</strong>里（localStorage），不会上传到服务器，也不会被其他访客看到。每次调用由你的浏览器直连 DeepSeek。</p>
+      </div>
+      <div class="field">
+        <label for="model-input">模型</label>
+        <input id="model-input" type="text" spellcheck="false" placeholder="deepseek-chat">
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn--ink" id="btn-save-key">存 入</button>
+        <button class="btn btn--ghost" id="btn-clear-key">抹 去</button>
+      </div>
+      <div class="modal-actions modal-actions--stack">
+        <button class="btn btn--ghost" id="btn-local-mode">以「推演司」试玩（不联网）</button>
+        <button class="btn btn--danger" id="btn-restart">重 开 一 局</button>
+      </div>
+      <p class="hint hint--foot">大曜 · 武道王朝　v1.0<br>人物境界皆原创，格局致敬《雪中悍刀行》<br>纯静态站点 · 无后端 · 无账号 · 无埋点</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ 结局 ════════ -->
+<section id="screen-end" class="screen screen--end">
+  <div class="end-inner">
+    <div class="end-type" id="end-type">亡国</div>
+    <div class="end-rule"></div>
+    <div class="end-text" id="end-text"></div>
+    <div class="end-stats" id="end-stats"></div>
+    <div class="end-actions">
+      <button class="btn btn--ghost" id="btn-end-chronicle">阅 大 事 记</button>
+      <button class="btn btn--ink" id="btn-end-again">再 开 一 朝</button>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ 思考遮罩 ════════ -->
+<div class="veil" id="veil" hidden>
+  <div class="veil-inner">
+    <div class="ink-drop"><i></i></div>
+    <p class="veil-title">史 官 落 笔</p>
+    <p class="veil-sub" id="veil-sub">展卷 · 焚香</p>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+
+<script src="./app.js" type="module"></script>
+</body>
+</html>
