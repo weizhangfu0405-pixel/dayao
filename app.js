@@ -456,6 +456,12 @@ function saveKey() {
   setKey(key);
   setModel(model);
   refreshEngineState();
+  // 刚开第一次、还没有进度：存完直接开国
+  if (key && !G && !loadSave()) {
+    closeSettings();
+    newGame('ai');
+    return;
+  }
   toast(key ? '密钥已存于本机浏览器' : '密钥已清除');
 }
 
